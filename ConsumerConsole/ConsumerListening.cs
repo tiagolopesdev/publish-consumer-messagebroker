@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Text;
+using System.Text.Json;
 
 namespace ConsumerConsole
 {
@@ -31,8 +33,20 @@ namespace ConsumerConsole
                 
                 // PROCESS TO MESSAGE
 
+                var stringMessage = Encoding.UTF8.GetString(args.Body.ToArray());
+
+                var test = JsonSerializer.Deserialize<dynamic>(stringMessage);
+
                 channel.BasicAck(args.DeliveryTag, false);
             };
+            /*
+             consumer.Received += (model, ea) =>
+            {
+                byte[] body = ea.Body.ToArray();
+                var stringMessage = Encoding.UTF8.GetString(body);
+                T foundedObject = JsonSerializer.Deserialize<T>(stringMessage);
+            };
+             */
 
             channel.BasicConsume(QUEUE_NAME, autoAck: false, consumer);
 
